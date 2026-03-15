@@ -1,0 +1,37 @@
+# ══════════════════════════════════════════════════════════
+#  iorana.dev — Docker Compose optimizado para Coolify
+# ══════════════════════════════════════════════════════════
+
+services:
+
+  # ── App Node.js ──────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - REDIS_URL=${REDIS_URL}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - PASSWORD_HASH=${PASSWORD_HASH}
+    depends_on:
+      - redis
+    # ⚠️ Sin "ports:" — Coolify expone el servicio via su proxy (Traefik)
+    # Coolify asigna el dominio automáticamente al puerto 3000
+
+  # ── Redis ────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 64mb
+      --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    # Sin "ports:" — solo accesible internamente dentro del stack
+
+volumes:
+  redis_data:

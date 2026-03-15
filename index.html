@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iorana.dev — Acceso</title>
+
+  <!-- Anti-indexación (refuerzo cliente) -->
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <meta name="googlebot" content="noindex, nofollow" />
+  <meta name="referrer" content="no-referrer" />
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;700;800&display=swap');
+
+    :root {
+      --bg:      #080c10;
+      --surface: #0d1117;
+      --border:  #1e2d3d;
+      --accent:  #00e5ff;
+      --accent2: #0066ff;
+      --danger:  #ff3b5c;
+      --success: #00e676;
+      --text:    #c9d6e3;
+      --muted:   #4a5568;
+      --mono:    'Share Tech Mono', monospace;
+      --ui:      'Syne', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.07) 2px, rgba(0,0,0,.07) 4px);
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .orb {
+      position: fixed;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,102,255,.12) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      pointer-events: none;
+      animation: pulse 6s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { transform: translate(-50%,-50%) scale(1); }
+      50%      { transform: translate(-50%,-50%) scale(1.1); }
+    }
+
+    /* ─── Card ─────────────────────────────────── */
+    .card {
+      position: relative; z-index: 10;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      width: min(440px, 94vw);
+      padding: 40px 36px 36px;
+      box-shadow: 0 0 0 1px rgba(0,229,255,.04), 0 24px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.03);
+      animation: slideUp .5s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Header ────────────────────────────────── */
+    .header { margin-bottom: 32px; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 10px; letter-spacing: .12em; color: var(--danger);
+      background: rgba(255,59,92,.08); border: 1px solid rgba(255,59,92,.2);
+      border-radius: 2px; padding: 3px 8px; margin-bottom: 16px; text-transform: uppercase;
+    }
+    .badge::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--danger); animation: blink 1.4s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    .logo { font-family: var(--ui); font-weight: 800; font-size: 28px; color: #fff; letter-spacing: -.02em; }
+    .logo span { color: var(--accent); }
+    .subtitle { margin-top: 6px; font-size: 11px; color: var(--muted); letter-spacing: .06em; }
+
+    /* ─── Form ──────────────────────────────────── */
+    label { display: block; font-size: 10px; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .input-wrap { position: relative; margin-bottom: 16px; }
+
+    input[type="password"], input[type="text"] {
+      width: 100%; background: rgba(255,255,255,.03);
+      border: 1px solid var(--border); border-radius: 3px;
+      color: var(--accent); font-family: var(--mono);
+      font-size: 15px; letter-spacing: .15em;
+      padding: 12px 44px 12px 14px;
+      outline: none; transition: border-color .2s, box-shadow .2s;
+      caret-color: var(--accent);
+    }
+    input::placeholder { color: var(--muted); letter-spacing: .05em; font-size: 13px; }
+    input:focus { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(0,102,255,.12); }
+    input.error { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(255,59,92,.1); }
+
+    .eye-btn {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; color: var(--muted);
+      padding: 4px; transition: color .2s; display: flex;
+    }
+    .eye-btn:hover { color: var(--accent); }
+
+    /* ─── Alert ─────────────────────────────────── */
+    .alert {
+      display: none; align-items: center; gap: 8px;
+      font-size: 11px; padding: 10px 12px;
+      border-radius: 3px; margin-bottom: 14px;
+      animation: fadeIn .2s ease;
+    }
+    .alert.show { display: flex; }
+    .alert.danger  { color: var(--danger);  background: rgba(255,59,92,.08);  border: 1px solid rgba(255,59,92,.2); }
+    .alert.warning { color: #ffb300; background: rgba(255,179,0,.08); border: 1px solid rgba(255,179,0,.2); }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+
+    @keyframes shake {
+      0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)}
+    }
+    .shake { animation: shake .4s cubic-bezier(.36,.07,.19,.97) both; }
+
+    /* ─── Button ─────────────────────────────────── */
+    .btn {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, var(--accent2), #0044cc);
+      border: none; border-radius: 3px; color: #fff;
+      font-family: var(--mono); font-size: 13px; letter-spacing: .12em; text-transform: uppercase;
+      cursor: pointer; position: relative; overflow: hidden;
+      transition: opacity .2s, transform .1s;
+    }
+    .btn:hover  { opacity: .9; }
+    .btn:active { transform: scale(.98); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .btn .spinner {
+      display: none; position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.2); border-top-color: #fff;
+      border-radius: 50%; animation: spin .7s linear infinite;
+    }
+    .btn.loading .btn-text { opacity: 0; }
+    .btn.loading .spinner  { display: block; }
+    @keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+
+    /* ─── Footer ─────────────────────────────────── */
+    .footer {
+      margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .sys-info { font-size: 10px; color: var(--muted); letter-spacing: .04em; }
+    .sys-info span { color: var(--accent); }
+
+    /* ─── Success ────────────────────────────────── */
+    #successOverlay {
+      display: none; position: fixed; inset: 0;
+      background: var(--bg); z-index: 100;
+      align-items: center; justify-content: center; flex-direction: column; gap: 16px;
+    }
+    #successOverlay.show { display: flex; animation: fadeIn .4s ease; }
+    .success-icon {
+      width: 56px; height: 56px; border: 2px solid var(--success); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; color: var(--success);
+      animation: scaleIn .4s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes scaleIn { from{transform:scale(0)} to{transform:scale(1)} }
+    .success-title { font-family: var(--ui); font-size: 20px; font-weight: 700; color: #fff; }
+    .success-sub   { font-size: 12px; color: var(--muted); letter-spacing: .06em; }
+    .progress-wrap { width: 200px; height: 2px; background: var(--border); border-radius: 99px; overflow: hidden; margin-top: 8px; }
+    .progress-bar  { height: 100%; background: var(--success); border-radius: 99px; width: 0; transition: width 1.4s linear; }
+  </style>
+</head>
+<body>
+<div class="orb"></div>
+
+<div class="card" id="card">
+  <div class="header">
+    <div class="badge">Acceso restringido</div>
+    <div class="logo">iorana<span>.dev</span></div>
+    <div class="subtitle">Entorno privado · Solo uso interno</div>
+  </div>
+
+  <div class="alert danger" id="alertDanger">
+    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span id="alertText">Contraseña incorrecta.</span>
+  </div>
+
+  <div class="alert warning" id="alertWarning">
+    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span id="alertWarnText">Demasiados intentos. Espera 15 minutos.</span>
+  </div>
+
+  <label for="password">Contraseña de acceso</label>
+  <div class="input-wrap" id="inputWrap">
+    <input type="password" id="password" placeholder="Introduce la clave de acceso" autocomplete="current-password" autofocus />
+    <button class="eye-btn" type="button" id="eyeBtn">
+      <svg id="eyeIcon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+      </svg>
+    </button>
+  </div>
+
+  <button class="btn" id="loginBtn">
+    <span class="btn-text">Acceder al portal</span>
+    <div class="spinner"></div>
+  </button>
+
+  <div class="footer">
+    <div class="sys-info">Estado: <span>ONLINE</span></div>
+    <div class="sys-info" id="clock"></div>
+  </div>
+</div>
+
+<div id="successOverlay">
+  <div class="success-icon">
+    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <div class="success-title">Acceso concedido</div>
+  <div class="success-sub">Iniciando sesión…</div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+</div>
+
+<script>
+  // ── Reloj ──────────────────────────────────────
+  const clockEl = document.getElementById("clock");
+  const tick = () => clockEl.textContent = new Date().toLocaleTimeString("es-ES");
+  tick(); setInterval(tick, 1000);
+
+  // ── Toggle contraseña ──────────────────────────
+  const pwInput = document.getElementById("password");
+  const eyeBtn  = document.getElementById("eyeBtn");
+  const eyeIcon = document.getElementById("eyeIcon");
+  const open    = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+  const closed  = `<path d="M17.94 17.94A10 10 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.1 9.1 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+  eyeBtn.addEventListener("click", () => {
+    const show = pwInput.type === "password";
+    pwInput.type = show ? "text" : "password";
+    eyeIcon.innerHTML = show ? closed : open;
+  });
+
+  // ── Login ──────────────────────────────────────
+  const btn       = document.getElementById("loginBtn");
+  const alertD    = document.getElementById("alertDanger");
+  const alertW    = document.getElementById("alertWarning");
+  const alertText = document.getElementById("alertText");
+  const wrap      = document.getElementById("inputWrap");
+
+  function clearAlerts() {
+    alertD.classList.remove("show");
+    alertW.classList.remove("show");
+    pwInput.classList.remove("error");
+  }
+
+  async function doLogin() {
+    clearAlerts();
+    const password = pwInput.value;
+    if (!password) { pwInput.focus(); return; }
+
+    btn.disabled = true;
+    btn.classList.add("loading");
+
+    try {
+      const res  = await fetch("/auth/login", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ password }),
+      });
+      const data = await res.json();
+
+      if (res.status === 429) {
+        document.getElementById("alertWarnText").textContent = data.error;
+        alertW.classList.add("show");
+        btn.disabled = false;
+        btn.classList.remove("loading");
+        return;
+      }
+
+      if (!data.success) {
+        alertText.textContent = data.error || "Contraseña incorrecta.";
+        alertD.classList.add("show");
+        pwInput.classList.add("error");
+        wrap.classList.add("shake");
+        wrap.addEventListener("animationend", () => wrap.classList.remove("shake"), { once: true });
+        pwInput.value = "";
+        pwInput.focus();
+        btn.disabled = false;
+        btn.classList.remove("loading");
+        return;
+      }
+
+      // ✓ Éxito
+      const overlay = document.getElementById("successOverlay");
+      overlay.classList.add("show");
+      setTimeout(() => document.getElementById("progressBar").style.width = "100%", 50);
+      setTimeout(() => window.location.href = data.redirect || "/portal", 1600);
+
+    } catch {
+      alertText.textContent = "Error de conexión. Inténtalo de nuevo.";
+      alertD.classList.add("show");
+      btn.disabled = false;
+      btn.classList.remove("loading");
+    }
+  }
+
+  btn.addEventListener("click", doLogin);
+  pwInput.addEventListener("keydown", e => e.key === "Enter" && doLogin());
+  pwInput.addEventListener("input", clearAlerts);
+</script>
+</body>
+</html>
