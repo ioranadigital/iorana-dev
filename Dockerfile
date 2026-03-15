@@ -11,7 +11,7 @@ WORKDIR /app
 
 # Instalar dependencias primero (capa cacheada)
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm install --omit=dev
 
 # Copiar código fuente
 COPY --chown=iorana:iorana . .
