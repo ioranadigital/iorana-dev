@@ -238,13 +238,17 @@
       return;
     }
 
+    // Leer returnTo de la URL si existe
+    const params   = new URLSearchParams(window.location.search);
+    const returnTo = params.get('returnTo') || '';
+
     btn.disabled = true; btn.classList.add('loading');
 
     try {
       const res  = await fetch('/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, returnTo }),
       });
       const data = await res.json();
 
