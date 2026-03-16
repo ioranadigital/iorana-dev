@@ -37,7 +37,7 @@ const USERS = {
   "n8n-user": {
     passwordHash: process.env.N8N_USER_HASH,
     tools: ["n8n.iorana.dev"],
-    displayName: "Lara"
+    displayName: "Usuario N8N"
   },
 
   // Ejemplo: usuario con acceso a varias herramientas
@@ -45,6 +45,13 @@ const USERS = {
     passwordHash: process.env.DEV_USER_HASH,
     tools: ["n8n.iorana.dev", "app.iorana.dev", "tool.iorana.dev"],
     displayName: "Developer"
+  },
+
+  // Lara
+  "lara": {
+    passwordHash: process.env.LARA_HASH,
+    tools: ["n8n.iorana.dev"],
+    displayName: "Lara"
   },
 
 };
