@@ -47,6 +47,7 @@ services:
       - "traefik.http.routers.n8n-router.rule=Host(`n8n.iorana.dev`)"
       - "traefik.http.routers.n8n-router.entrypoints=websecure"
       - "traefik.http.routers.n8n-router.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.n8n-router.middlewares=iorana-auth@docker"
       - "traefik.http.services.n8n-service.loadbalancer.server.port=5678"
 
 # ── Volúmenes (Sección única) ──────────────────────────────
