@@ -200,18 +200,56 @@
   </div>
 </main>
 
+<div class="grid" id="toolsGrid">
+  <p style="color: var(--muted)">Cargando herramientas autorizadas...</p>
+</div>
+
 <script>
-  // Al cargar la página, pedimos nuestras herramientas permitidas
-  async function loadTools() {
+  async function loadPortal() {
     try {
-      const response = await fetch('/api/my-tools');
-      const data = await response.json();
-      
-      // Aquí podrías usar data.tools para ocultar o mostrar los botones
-      // Ejemplo: si el usuario no tiene "n8n.iorana.dev", ocultas ese card.
-      console.log("Herramientas para " + data.displayName, data.tools);
+      const res = await fetch('/api/my-tools');
+      const user = await res.json();
+
+      const grid = document.getElementById('toolsGrid');
+      grid.innerHTML = ''; // Limpiamos el cargando
+
+      // Definimos la base de datos de botones disponibles
+      const availableTools = [
+        {
+          id: 'n8n.iorana.dev',
+          title: 'n8n Automation',
+          desc: 'Flujos de trabajo y automatizaciones inteligentes.',
+          tag: 'Workflow',
+          url: 'https://n8n.iorana.dev',
+          icon: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>'
+        }
+        // Aquí puedes añadir más herramientas en el futuro
+      ];
+
+      // Filtramos: si el usuario tiene "*" o el dominio específico
+      const myTools = availableTools.filter(t => 
+        user.tools.includes('*') || user.tools.includes(t.id)
+      );
+
+      if (myTools.length === 0) {
+        grid.innerHTML = '<p style="color: var(--muted)">No tienes herramientas asignadas. Contacta con el admin.</p>';
+        return;
+      }
+
+      myTools.forEach(tool => {
+        grid.innerHTML += `
+          <a href="${tool.url}" class="tool-card">
+            <div class="card-ico">${tool.icon}</div>
+            <div class="card-title">${tool.title}</div>
+            <div class="card-desc">${tool.desc}</div>
+            <span class="card-tag">${tool.tag}</span>
+          </a>
+        `;
+      });
+
     } catch (err) {
-      window.location.href = '/'; // Si falla, al login
+      console.error("Error cargando el portal", err);
+      window.location.href = '/';
     }
   }
 
@@ -220,7 +258,7 @@
     window.location.href = '/';
   });
 
-  loadTools();
+  loadPortal();
 </script>
 </body>
 </html>
