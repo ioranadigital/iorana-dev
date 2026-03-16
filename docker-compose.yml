@@ -35,3 +35,27 @@ services:
 
 volumes:
   redis_data:
+
+  # ── n8n Automation ───────────────────────────────────────
+  n8n:
+    image: n8nio/n8n:latest
+    restart: unless-stopped
+    environment:
+      - N8N_HOST=n8n.iorana.dev
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - WEBHOOK_URL=https://n8n.iorana.dev/
+    volumes:
+      - n8n_data:/home/node/.n8n
+    # Las labels son CRUCIALES para que Traefik sepa a dónde enviar el tráfico
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.n8n-router.rule=Host(`n8n.iorana.dev`)"
+      - "traefik.http.routers.n8n-router.entrypoints=websecure"
+      - "traefik.http.routers.n8n-router.tls.certresolver=letsencrypt"
+      - "traefik.http.services.n8n-service.loadbalancer.server.port=5678"
+
+volumes:
+  redis_data:
+  n8n_data: # Añadimos el volumen para no perder tus flujos
