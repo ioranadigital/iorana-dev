@@ -1,0 +1,57 @@
+# ══════════════════════════════════════════════════════════
+#  iorana.dev — Docker Compose optimizado para Coolify
+# ══════════════════════════════════════════════════════════
+
+services:
+
+  # ── App Node.js (Portal) ─────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - PORT=${IORANA_DEV_FRONTEND_PORT:-3011}
+      - N8N_PORT=${N8N_PORT:-5678}
+      - REDIS_URL=${REDIS_URL}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - PASSWORD_HASH=${PASSWORD_HASH}
+    depends_on:
+      - redis
+
+  # ── Redis ────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 64mb
+      --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+
+  # ── n8n Automation ───────────────────────────────────────
+  n8n:
+    image: n8nio/n8n:latest
+    restart: unless-stopped
+    environment:
+      - N8N_HOST=n8n.iorana.dev
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - WEBHOOK_URL=https://n8n.iorana.dev/
+    volumes:
+      - n8n_data:/home/node/.n8n
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.n8n-router.rule=Host(`n8n.iorana.dev`)"
+      - "traefik.http.routers.n8n-router.entrypoints=websecure"
+      - "traefik.http.routers.n8n-router.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.n8n-router.middlewares=iorana-auth@docker"
+      - "traefik.http.services.n8n-service.loadbalancer.server.port=5678"
+
+# ── Volúmenes (Sección única) ──────────────────────────────
+volumes:
+  redis_data:
+  n8n_data:
