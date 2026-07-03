@@ -1,29 +1,9 @@
-# ══════════════════════════════════════════════════════════
-#  iorana.dev — Dockerfile
-# ══════════════════════════════════════════════════════════
-
-FROM node:20-alpine
-
-# Instalar pnpm globalmente
+FROM node:18-alpine
 RUN npm install -g pnpm
-
-# Usuario no-root para mayor seguridad
-RUN addgroup -S iorana && adduser -S iorana -G iorana
-
 WORKDIR /app
-
-# Instalar dependencias primero (capa cacheada)
-COPY package*.json ./
-RUN npm install --omit=dev
-
-# Copiar código fuente
-COPY --chown=iorana:iorana . .
-
-# No copiar .env al contenedor (se inyecta via docker-compose env)
-RUN rm -f .env
-
-USER iorana
-
+COPY package.json pnpm-lock.yaml* ./
+RUN pnpm install --frozen-lockfile
+COPY . .
 EXPOSE 3000
-
-CMD ["node", "server.js"]
+ENV NODE_ENV=production
+CMD ["pnpm", "start"]
